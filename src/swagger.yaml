@@ -1,0 +1,387 @@
+openapi: 3.0.1
+info:
+  title: uBan API
+  description: Visual documentation for the uBan API
+  version: '0.1'
+servers:
+  - url: 'http://localhost:5000'
+tags:
+  - name: Users
+  - name: Uploads
+  - name: Tokens
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+# 2) Apply the security globally to all operations
+security:
+  - bearerAuth: []         # use the same name as above
+paths:
+  /api/v1/users/all:
+    get:
+      tags:
+        - Users
+      description: Get all users
+      responses:
+        '200':
+          description: success
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+    delete:
+      tags:
+        - Users
+      description: Delete all users
+      responses:
+        '200':
+          description: success
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+  /api/v1/users/{userId}:
+    get:
+      tags:
+        - Users
+      description: Get user
+      parameters:
+        - name: userId
+          in: path
+          description: 'User id'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: success
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+    put:
+      tags:
+        - Users
+      description: Update user
+      parameters:
+        - name: userId
+          in: path
+          description: 'User id'
+          required: true
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                password:
+                  type: string
+                roleName:
+                  type: string
+                email:
+                  type: string
+            examples:
+              '0':
+                value: |-
+                  {
+                      "email": "example@email.com",
+                      "firstName": "Example Name",
+                      "lastName": "Example",
+                      "roleName": "individual",
+                      "password": "example1",
+                      "preparationCenter": "Example Preparation Center"
+                  }
+      responses:
+        '200':
+          description: success
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+    delete:
+      tags:
+        - Users
+      description: Delete user
+      parameters:
+        - name: userId
+          in: path
+          description: 'User id'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: success
+  /api/v1/users/resetPassword/{email}:
+    get:
+      tags:
+        - Users
+      description: Reset user password
+      parameters:
+        - name: email
+          in: path
+          description: 'User email'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+        '404':
+          description: email does not exist
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+  /api/v1/users/verifyEmail/{token}:
+    get:
+      tags:
+        - Users
+      description: Verify user email
+      parameters:
+        - name: token
+          in: path
+          description: 'Verification token'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: success
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+  /api/v1/users/sendVerificationEmail/{userId}:
+    get:
+      tags:
+        - Users
+      description: Resend account verification email
+      parameters:
+        - name: userId
+          in: path
+          description: 'User id'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: success
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+  /api/v1/users/checkEmail:
+    post:
+      tags:
+        - Users
+      description: Check if email exists in database
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: success
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+        '401':
+          description: email does not exist
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+  /api/v1/users/register:
+    post:
+      tags:
+        - Users
+      description: Create user
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                preparationCenter:
+                  type: string
+                password:
+                  type: string
+                roleName:
+                  type: string
+                email:
+                  type: string
+                profilePicture:
+                  type: string
+                  format: binary
+            examples:
+              '0':
+                value: |-
+                  {
+                      "email": "example@email.com",
+                      "firstName": "Example Name",
+                      "lastName": "Example",
+                      "roleName": "individual",
+                      "password": "example1",
+                      "preparationCenter": "Example Preparation Center"
+                  }
+      responses:
+        '201':
+          description: success
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+  /api/v1/users/password/{userToken}:
+    put:
+      tags:
+        - Users
+      description: Update user password
+      parameters:
+        - name: userToken
+          in: path
+          description: 'User token'
+          required: true
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+            examples:
+              '0':
+                value: |-
+                  {
+                      "password": "example1"
+                  }
+      responses:
+        '200':
+          description: success
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+  /api/v1/users/profilePicture/{userId}:
+    put:
+      tags:
+        - Users
+      description: Update user profile picture
+      parameters:
+        - name: userId
+          in: path
+          description: 'User id'
+          required: true
+          type: string
+      requestBody:
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: success
+          content:
+            text/plain; charset=utf-8:
+              schema:
+                type: string
+  /api/v1/users/login:
+    post:
+      tags:
+        - Users
+      description: Login user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+            examples:
+              '0':
+                value: |-
+                  {
+                      "email": "example@email.com",
+                      "password": "example1"
+                  }
+      responses:
+        '200':
+          description: success
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+
+    post:
+      tags:
+        - Exams
+      description: Create exam
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+            examples:
+              '0':
+                value: |-
+                  {
+                      "name": "example",
+                      "price": 12
+                  }
+  /api/v1/uploads/{filename}:
+    get:
+      tags:
+        - Uploads
+      description: Get a file from the uploads folder
+      parameters:
+        - name: filename
+          in: path
+          description: 'File name'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: success
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+  /api/v1/verify-token:
+    get:
+      tags:
+        - Tokens
+      description: Verify token
+      responses:
+        '200':
+          description: success
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string

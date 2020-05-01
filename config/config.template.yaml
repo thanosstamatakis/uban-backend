@@ -1,0 +1,57 @@
+development:
+  backend:
+    ip: 'localhost'
+    port: 5000
+  frontend:
+    ip: 'localhost'
+    port: 4200
+  database:
+    ip: ''
+    port: ''
+    name: ''
+    username: ''
+    password: ''
+  authorization:
+    jwt-key: 'secret'
+    session: '1d'
+  logging:
+    timestamp-format: 'YYYY-MM-DD HH:mm:ss'
+    format: '${info.label}|${info.timestamp}|${info.level}|${info.message}'
+    warning-folder: 'logging/warning.log'
+    error-folder: 'logging/error.log'
+    level: 'debug'
+  email:
+    service: ''
+    user: ''
+    password: ''
+  google-oauth:
+    client-id: '647941072276-d6m34gl68i8ape6e4u86equevd1h5foc.apps.googleusercontent.com'
+
+production:
+  backend:
+    ip: 'localhost'
+    port: 5000
+  frontend:
+    ip: 'localhost'
+    port: 4200
+  database:
+    ip: ''
+    port: ''
+    name: ''
+    username: ''
+    password: ''
+  authorization:
+    jwt-key: 'secret'
+    session: '1d'
+  logging:
+    timestamp-format: 'YYYY-MM-DD HH:mm:ss'
+    format: '${info.label}|${info.timestamp}|${info.level}|${info.message}'
+    warning-folder: 'logging/warning.log'
+    error-folder: 'logging/error.log'
+    level: 'debug'
+  email:
+    service: ''
+    user: ''
+    password: ''
+  google-oauth:
+    client-id: ''

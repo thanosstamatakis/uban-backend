@@ -1,0 +1,16 @@
+# JS generated files.
+node_modules
+# Config yaml file.
+config.yaml
+# Logs.
+*.log
+# Uploaded files
+uploads/*
+!uploads/defaultProfilePic.png
+!uploads/defaultPostImage.jpeg
+!uploads/errorImage.png
+# Download folder
+downloads/*
+!downloads/.gitkeep
+#VScodeFiles
+.DS_Store
