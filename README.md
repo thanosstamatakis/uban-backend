@@ -30,8 +30,8 @@ and then set these parameters in the `config/config.yaml` file.
 ```YAML
         email:
             service: 'gmail'
-            user: 'ubankanban@gmail.com'
-            password: 'uB@nK@nban2020'
+            user: <email>
+            password: <password>
         backend:
             ip: 'localhost'
             port: 5000
@@ -43,5 +43,5 @@ and then set these parameters in the `config/config.yaml` file.
             port: '27017'
             name: 'uban'
         google-oauth:
-            client-id: '647941072276-d6m34gl68i8ape6e4u86equevd1h5foc.apps.googleusercontent.com'
+            client-id: <oAuthClientId>
 ```
