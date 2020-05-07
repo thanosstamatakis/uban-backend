@@ -62,20 +62,20 @@ const port = config.backendPort;
 server.listen(port, () => logger.info(logMessages.getStartupLog(port)));
 
 // Sockets
-// io.on('connection', socketHandler.onConnection);
-io.on('connection', (socket) => {
-	socket.on('join', ({ room }) => {
-		console.log(room);
-		console.log(`User connected to ${room}`);
-		socket.join(room, () => {
-			let rooms = Object.keys(socket.rooms);
-			console.log(rooms);
-			socket.to(room).emit('message', 'a new user has joined the room');
-		});
-	});
+io.on('connection', socketHandler.onConnection);
+// io.on('connection', (socket) => {
+// 	socket.on('join', ({ room }) => {
+// 		console.log(room);
+// 		console.log(`User connected to ${room}`);
+// 		socket.join(room, () => {
+// 			let rooms = Object.keys(socket.rooms);
+// 			console.log(rooms);
+// 			socket.to(room).emit('message', 'a new user has joined the room');
+// 		});
+// 	});
 
-	socket.on('message', ({ room, message }) => {
-		console.log(room, message);
-		socket.to(room).emit('message', message);
-	});
-});
+// 	socket.on('message', ({ room, message }) => {
+// 		console.log(room, message);
+// 		socket.to(room).emit('message', message);
+// 	});
+// });

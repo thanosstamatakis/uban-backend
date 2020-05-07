@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const Board = require('~models/Board');
 
-// Create the user model for mongoose
+// Create the team model for mongoose
 const teamSchema = mongoose.Schema({
 	_id: mongoose.Schema.Types.ObjectId,
 	name: { type: String, required: true },
@@ -12,7 +13,7 @@ const teamSchema = mongoose.Schema({
 			required: true,
 		},
 	],
-	board: { type: Object, default: null },
+	board: Board.schema,
 });
 
 module.exports = mongoose.model('Team', teamSchema);
