@@ -29,7 +29,7 @@ module.exports.onConnection = (socket) => {
 	});
 
 	socket.on('message', ({ room, message }) => {
-		// console.log(room, message);
+		console.log(room, message);
 		socket.to(room).emit('message', message);
 	});
 };
