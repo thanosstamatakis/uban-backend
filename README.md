@@ -4,8 +4,8 @@ This is the official repo and project for the uBan web API.
 
 ### Requirements
 
-- NodeJS
-- MongoDB
+- NodeJS [Install on Windows](https://nodejs.org/en/download/) / [Install on Ubuntu](https://hackernoon.com/how-to-install-node-js-on-ubuntu-16-04-18-04-using-nvm-node-version-manager-668a7166b854)
+- MongoDB [Install on Windows](https://www.mongodb.com/download-center/community) / [Install on Ubuntu](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
 
 ### Install Instructions
 
