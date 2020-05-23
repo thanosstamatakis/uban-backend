@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Column = require('~models/Column');
+// const Column = require('~models/Column');
 
 // Create the user model for mongoose
 const boardSchema = mongoose.Schema({
@@ -10,7 +10,13 @@ const boardSchema = mongoose.Schema({
 		required: true,
 	},
 	name: { type: String, required: true },
-	columns: [Column.schema],
+	columns: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Column',
+			required: true,
+		},
+	],
 });
 
 module.exports = mongoose.model('Board', boardSchema);

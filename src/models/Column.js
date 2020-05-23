@@ -10,7 +10,13 @@ const columnSchema = mongoose.Schema({
 		required: true,
 	},
 	name: { type: String, required: true },
-	cards: [Card.schema],
+	cards: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Card',
+			required: true,
+		},
+	],
 });
 
 module.exports = mongoose.model('Column', columnSchema);

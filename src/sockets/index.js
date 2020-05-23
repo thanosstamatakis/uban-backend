@@ -1,5 +1,9 @@
+const mongoose = require('mongoose');
+
 const teamsService = require('~services/team');
 const authService = require('~services/authentication');
+const boardService = require('~services/board');
+const columnService = require('~services/column');
 
 /**
  * Main sockets index.
@@ -19,17 +23,36 @@ module.exports.onConnection = (socket) => {
 
 	socket.on('join', async ({ room }) => {
 		let team = await teamsService.getByQuery({ _id: room });
-		console.log(team[0]);
-		// socket.emit('board', team[0].board);
+		socket.emit('board', team[0]);
 		socket.join(room, () => {
 			let rooms = Object.keys(socket.rooms);
-			// console.log(rooms);
 			socket.to(room).emit('message', 'a new user has joined the room');
 		});
 	});
 
+	socket.on('addColumn', async ({ room, columnName }) => {
+		try {
+			// console.log(room, columnName);
+			// const smth = await boardService.getByQuery({});
+			// console.log(smth);
+			let column = {
+				_id: mongoose.Types.ObjectId(),
+				team: room,
+				name: columnName,
+				cards: [],
+			};
+			const columnResult = await columnService.createColumn(column);
+			await boardService.addColumnToBoard(columnResult.team, columnResult._id);
+			const team = await teamsService.getByQuery({ _id: room });
+			console.log(team);
+			socket.to(room).emit('board', team[0]);
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
 	socket.on('message', ({ room, message }) => {
-		// console.log(room, message);
+		console.log(room, message);
 		socket.to(room).emit('message', message);
 	});
 };

@@ -19,24 +19,31 @@ const getByQuery = async (query) => {
 };
 
 const getAllBoards = async () => {
-	const result = await Board.find().populate('team').exec();
+	const result = await Board.find().populate('columns').exec();
 	return result;
 };
 
 const createBoard = async (board) => {
+	// Instantiate column and add to board
+	let column = {
+		_id: mongoose.Types.ObjectId(),
+		team: board.team,
+		name: 'My first column',
+	};
+	const newCol = await columnService.createInitialColumn(column);
+	board = { ...board, columns: [newCol._id] };
+
+	// Create board & store to Mongo
 	const newBoard = new Board(board);
-	const result = await newBoard.save(async (err, doc) => {
-		if (err) console.error(err);
-
-		let column = {
-			_id: mongoose.Types.ObjectId(),
-			team: newBoard.team,
-			name: 'My first column',
-		};
-
-		await columnService.createInitialColumn(column);
-	});
+	const result = await newBoard.save();
 	return result;
+};
+
+const addColumnToBoard = async (teamId, columnId) => {
+	await Board.updateOne(
+		{ team: teamId },
+		{ $push: { columns: columnId } }
+	).exec();
 };
 
 const updateBoard = async (id, updateOpts) => {
@@ -48,4 +55,5 @@ module.exports = {
 	getAllBoards,
 	createBoard,
 	updateBoard,
+	addColumnToBoard,
 };

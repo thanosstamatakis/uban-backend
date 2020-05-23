@@ -13,6 +13,27 @@ const Team = require('~models/Team');
 
 const getByQuery = async (query) => {
 	const result = await Team.find(query)
+		.populate({
+			path: 'board',
+			select: {
+				__v: 0,
+				// team: 0,
+			},
+			populate: {
+				path: 'columns',
+				select: {
+					__v: 0,
+					// team: 0,
+				},
+				populate: {
+					path: 'cards',
+					select: {
+						__v: 0,
+						// team: 0,
+					},
+				},
+			},
+		})
 		// .select({ password: 0 })
 		.exec();
 	return result;
@@ -24,40 +45,20 @@ const getAllTeams = async () => {
 };
 
 const createTeam = async (team) => {
+	// Instantiate board and add to team
+	let board = {
+		_id: mongoose.Types.ObjectId(),
+		team: team._id,
+		name: team.name,
+	};
+	const newBoard = await boardService.createBoard(board);
+	team = { ...team, board: newBoard._id };
+
+	// Create team & store to Mongo
 	const newTeam = new Team(team);
-	const result = await newTeam.save(async (err, doc) => {
-		if (err) console.error(err);
-
-		let board = {
-			_id: mongoose.Types.ObjectId(),
-			team: newTeam._id,
-			name: newTeam.name,
-		};
-
-		await boardService.createBoard(board);
-	});
+	const result = await newTeam.save();
 	return result;
 };
-
-// const author = new Person({
-// 	_id: new mongoose.Types.ObjectId(),
-// 	name: 'Ian Fleming',
-// 	age: 50
-//   });
-
-//   author.save(function (err) {
-// 	if (err) return handleError(err);
-
-// 	const story1 = new Story({
-// 	  title: 'Casino Royale',
-// 	  author: author._id    // assign the _id from the person
-// 	});
-
-// 	story1.save(function (err) {
-// 	  if (err) return handleError(err);
-// 	  // that's it!
-// 	});
-//   });
 
 const updateTeam = async (id, updateOpts) => {
 	await Team.updateOne({ _id: id }, { $set: updateOpts }).exec();

@@ -13,7 +13,11 @@ const teamSchema = mongoose.Schema({
 			required: true,
 		},
 	],
-	board: Board.schema,
+	board: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Board',
+		required: true,
+	},
 });
 
 module.exports = mongoose.model('Team', teamSchema);

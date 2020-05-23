@@ -61,21 +61,130 @@ app.use((error, req, res, next) => {
 const port = config.backendPort;
 server.listen(port, () => logger.info(logMessages.getStartupLog(port)));
 
+const teamsService = require('~services/team');
+const authService = require('~services/authentication');
+const boardService = require('~services/board');
+const columnService = require('~services/column');
+const cardService = require('~services/card');
 // Sockets
-io.on('connection', socketHandler.onConnection);
-// io.on('connection', (socket) => {
-// 	socket.on('join', ({ room }) => {
-// 		console.log(room);
-// 		console.log(`User connected to ${room}`);
-// 		socket.join(room, () => {
-// 			let rooms = Object.keys(socket.rooms);
-// 			console.log(rooms);
-// 			socket.to(room).emit('message', 'a new user has joined the room');
-// 		});
-// 	});
+// io.on('connection', socketHandler.onConnection);
+io.on('connection', (socket) => {
+	console.info(`Client connected [id=${socket.id}]`);
+	let sequenceNumberByClient = new Map();
+	// socket.id.emit('message', 'Hey dude');
+	// initialize this client's sequence number
+	sequenceNumberByClient.set(socket, 1);
+	// when socket disconnects, remove it from the list:
+	socket.on('disconnect', () => {
+		sequenceNumberByClient.delete(socket);
+		console.info(`Client gone [id=${socket.id}]`);
+	});
 
-// 	socket.on('message', ({ room, message }) => {
-// 		console.log(room, message);
-// 		socket.to(room).emit('message', message);
-// 	});
-// });
+	socket.on('join', async ({ room }) => {
+		let team = await teamsService.getByQuery({ _id: room });
+		socket.emit('board', team[0]);
+		socket.join(room, () => {
+			let rooms = Object.keys(socket.rooms);
+			socket.to(room).emit('message', 'a new user has joined the room');
+		});
+	});
+
+	socket.on('addColumn', async ({ room, columnName }) => {
+		try {
+			let column = {
+				_id: mongoose.Types.ObjectId(),
+				team: room,
+				name: columnName,
+				cards: [],
+			};
+			const columnResult = await columnService.createColumn(column);
+			await boardService.addColumnToBoard(columnResult.team, columnResult._id);
+			const team = await teamsService.getByQuery({ _id: room });
+			io.in(room).emit('board', team[0]);
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
+	socket.on('addCard', async ({ room, columnId }) => {
+		try {
+			console.log('room:', room);
+			console.log('column:', columnId);
+			let card = {
+				_id: mongoose.Types.ObjectId(),
+				team: room,
+				name: 'New card',
+			};
+			const cardResult = await cardService.createCard(card);
+			await columnService.addCardToColumn(columnId, cardResult._id);
+			const team = await teamsService.getByQuery({ _id: room });
+			io.in(room).emit('board', team[0]);
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
+	socket.on('changeCardName', async ({ room, cardId, name, columnId }) => {
+		try {
+			console.log(room);
+			await cardService.updateCard(cardId, { name: name });
+			let newCard = await cardService.getByQuery({ _id: cardId });
+			newCard = JSON.stringify(newCard[0]);
+			newCard = JSON.parse(newCard);
+			socket.to(room).emit('cardUpdated', { ...newCard, columnId: columnId });
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
+	socket.on('changeColumnName', async ({ room, columnId, name }) => {
+		try {
+			console.log(room);
+			await columnService.updateColumn(columnId, { name: name });
+			const newColumn = await columnService.getByQuery({ _id: columnId });
+			socket.to(room).emit('columnUpdated', newColumn[0]);
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
+	socket.on(
+		'changeCardIndex',
+		async ({ room, cardId, columnId, oldIndex, newIndex }) => {
+			try {
+				await columnService.updateCardIndex(cardId, columnId, newIndex);
+				socket
+					.to(room)
+					.emit('cardIndexChanged', { columnId, oldIndex, newIndex });
+			} catch (error) {
+				console.error(error);
+			}
+		}
+	);
+
+	socket.on(
+		'transferCard',
+		async ({ room, cardId, columnId, prevColId, oldIndex, newIndex }) => {
+			try {
+				await columnService.updateCardColumn(
+					cardId,
+					columnId,
+					prevColId,
+					newIndex
+				);
+				socket.to(room).emit('cardPositionChanged', {
+					columnId,
+					prevColId,
+					oldIndex,
+					newIndex,
+				});
+			} catch (error) {
+				console.error(error);
+			}
+		}
+	);
+
+	socket.on('message', ({ room, message }) => {
+		socket.to(room).emit('message', message);
+	});
+});
