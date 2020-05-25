@@ -63,9 +63,11 @@ server.listen(port, () => logger.info(logMessages.getStartupLog(port)));
 
 const teamsService = require('~services/team');
 const authService = require('~services/authentication');
+const userService = require('~services/user');
 const boardService = require('~services/board');
 const columnService = require('~services/column');
 const cardService = require('~services/card');
+const messageService = require('~services/message');
 // Sockets
 // io.on('connection', socketHandler.onConnection);
 io.on('connection', (socket) => {
@@ -83,9 +85,10 @@ io.on('connection', (socket) => {
 	socket.on('join', async ({ room }) => {
 		let team = await teamsService.getByQuery({ _id: room });
 		socket.emit('board', team[0]);
+		const messages = await messageService.getByQuery({ team: room });
+		socket.emit('messages', messages);
 		socket.join(room, () => {
 			let rooms = Object.keys(socket.rooms);
-			socket.to(room).emit('message', 'a new user has joined the room');
 		});
 	});
 
@@ -184,7 +187,20 @@ io.on('connection', (socket) => {
 		}
 	);
 
-	socket.on('message', ({ room, message }) => {
-		socket.to(room).emit('message', message);
+	socket.on('message', async ({ room, sender, body }) => {
+		try {
+			const user = await userService.getByQuery({ _id: sender });
+			let message = {
+				_id: mongoose.Types.ObjectId(),
+				team: room,
+				sender: sender,
+				body: body,
+				seenBy: [sender],
+			};
+			const savedMessage = await messageService.createMessage(message);
+			io.in(room).emit('message', savedMessage);
+		} catch (error) {
+			console.error(error);
+		}
 	});
 });
