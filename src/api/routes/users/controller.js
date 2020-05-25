@@ -134,7 +134,7 @@ module.exports.update_user = async (req, res, next) => {
 		}
 		// Update user db entity.
 		await userService.updateUser(id, updateOpts);
-		
+
 		res.sendStatus(200);
 	} catch (error) {
 		next(error);
@@ -242,6 +242,18 @@ module.exports.update_profile_pic = async (req, res, next) => {
 
 		await userService.updateUser(id, { profilePicture: req.file.filename });
 		res.sendStatus(200);
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports.get_user_by_name = async (req, res, next) => {
+	try {
+		const name = req.query.user;
+		let users = await userService.getByQuery({
+			displayName: { $regex: `${name}` },
+		});
+		res.status(200).json({ users });
 	} catch (error) {
 		next(error);
 	}
