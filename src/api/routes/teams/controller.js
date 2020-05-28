@@ -26,6 +26,21 @@ module.exports.get_all_teams = async (req, res, next) => {
 };
 
 /**
+ * Controller function that returns all the team entities
+ */
+module.exports.get_team_by_user = async (req, res, next) => {
+	try {
+		const token = req.headers.authorization.split(' ')[1];
+		const decoded = await authService.decode(token);
+		const teams = await teamService.getByQuery({ members: decoded._id });
+
+		return res.status(200).json(teams);
+	} catch (error) {
+		next(error);
+	}
+};
+
+/**
  * Controller function that adds a new team entity
  */
 module.exports.add_new_team = async (req, res, next) => {
@@ -40,7 +55,7 @@ module.exports.add_new_team = async (req, res, next) => {
 			_id: mongoose.Types.ObjectId(),
 			name: body.name,
 			description: body.description,
-			members: [userId],
+			members: [userId, ...body.members],
 		};
 
 		const result = await teamService.createTeam(team);

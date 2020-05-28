@@ -249,9 +249,13 @@ module.exports.update_profile_pic = async (req, res, next) => {
 
 module.exports.get_user_by_name = async (req, res, next) => {
 	try {
+		// Exclude the user that is searching for team members
 		const name = req.query.user;
+		const token = req.headers.authorization.split(' ')[1];
+		const decoded = await authService.decode(token);
 		let users = await userService.getByQuery({
 			displayName: { $regex: `${name}` },
+			_id: { $nin: [decoded._id] },
 		});
 		res.status(200).json({ users });
 	} catch (error) {

@@ -198,6 +198,7 @@ io.on('connection', (socket) => {
 				seenBy: [sender],
 			};
 			const savedMessage = await messageService.createMessage(message);
+			console.log('New message', savedMessage);
 			io.in(room).emit('message', savedMessage);
 		} catch (error) {
 			console.error(error);

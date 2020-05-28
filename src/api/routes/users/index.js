@@ -37,7 +37,7 @@ const upload = multer({
 
 router.get('/all', checkAuth, controller.get_all_users);
 
-router.get('/name', controller.get_user_by_name);
+router.get('/name', checkAuth, controller.get_user_by_name);
 
 router.get('/:userId', checkAuth, controller.get_user_by_id);
 
