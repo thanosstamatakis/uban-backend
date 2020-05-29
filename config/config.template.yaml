@@ -25,7 +25,10 @@ development:
     user: ''
     password: ''
   google-oauth:
-    client-id: '647941072276-d6m34gl68i8ape6e4u86equevd1h5foc.apps.googleusercontent.com'
+    client-id: ''
+  github-oauth:
+    client-id: ''
+    client-secret: ''
 
 production:
   backend:
@@ -55,3 +58,5 @@ production:
     password: ''
   google-oauth:
     client-id: ''
+  github-oauth:
+    client-secret: ''

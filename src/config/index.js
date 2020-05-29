@@ -59,7 +59,15 @@ class Configuration {
 		this.emailUser = this.yamlConfig[this.env]['email']['user'];
 		this.emailPassword = this.yamlConfig[this.env]['email']['password'];
 		// oAuth configuration
-		this.googleClientKey = this.yamlConfig[this.env]['google-oauth']['client-id'];
+		this.googleClientKey = this.yamlConfig[this.env]['google-oauth'][
+			'client-id'
+		];
+		this.githubClientKey = this.yamlConfig[this.env]['github-oauth'][
+			'client-id'
+		];
+		this.githubClientSecret = this.yamlConfig[this.env]['github-oauth'][
+			'client-secret'
+		];
 	}
 
 	getBackendUrl() {
@@ -91,7 +99,7 @@ class Configuration {
 			format: format.combine(
 				format.label({ label: route }),
 				format.timestamp({ format: this.loggingDateFormat }),
-				format.printf(info => eval('`' + this.loggingFormat + '`'))
+				format.printf((info) => eval('`' + this.loggingFormat + '`'))
 			),
 			transports: [
 				new transports.Console(),
