@@ -10,7 +10,7 @@ const userSchema = mongoose.Schema({
 	},
 	email: {
 		type: String,
-		required: true,
+		required: false,
 		createIndexes: true,
 		// Validate the email field with regex
 		match: /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
@@ -18,10 +18,12 @@ const userSchema = mongoose.Schema({
 	displayName: { type: String, required: true },
 	password: { type: String, required: false },
 	googleId: { type: String, required: false },
+	githubId: { type: String, required: false },
+	githubAccessToken: { type: String, required: false },
 	roleName: {
 		type: String,
 		required: true,
-		enum: ['uban', 'google', 'facebook', 'twitter'],
+		enum: ['uban', 'google', 'facebook', 'github'],
 	},
 	profilePicture: {
 		type: String,
