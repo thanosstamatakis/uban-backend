@@ -39,6 +39,13 @@ const createBoard = async (board) => {
 	return result;
 };
 
+const createPreConfiguredBoard = async (board) => {
+	// Create board & store to Mongo
+	const newBoard = new Board(board);
+	const result = await newBoard.save();
+	return result;
+};
+
 const addColumnToBoard = async (teamId, columnId) => {
 	await Board.updateOne(
 		{ team: teamId },
@@ -56,4 +63,5 @@ module.exports = {
 	createBoard,
 	updateBoard,
 	addColumnToBoard,
+	createPreConfiguredBoard,
 };

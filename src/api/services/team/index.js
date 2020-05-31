@@ -60,6 +60,13 @@ const createTeam = async (team) => {
 	return result;
 };
 
+const createPreConfiguredTeam = async (team) => {
+	// Create team & store to Mongo
+	const newTeam = new Team(team);
+	const result = await newTeam.save();
+	return result;
+};
+
 const updateTeam = async (id, updateOpts) => {
 	await Team.updateOne({ _id: id }, { $set: updateOpts }).exec();
 };
@@ -69,4 +76,5 @@ module.exports = {
 	getAllTeams,
 	createTeam,
 	updateTeam,
+	createPreConfiguredTeam,
 };

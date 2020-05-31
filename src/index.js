@@ -67,6 +67,7 @@ const userService = require('~services/user');
 const boardService = require('~services/board');
 const columnService = require('~services/column');
 const cardService = require('~services/card');
+const gitService = require('~services/git');
 const messageService = require('~services/message');
 // Sockets
 // io.on('connection', socketHandler.onConnection);
@@ -92,69 +93,121 @@ io.on('connection', (socket) => {
 		});
 	});
 
-	socket.on('addColumn', async ({ room, columnName }) => {
-		try {
-			let column = {
-				_id: mongoose.Types.ObjectId(),
-				team: room,
-				name: columnName,
-				cards: [],
-			};
-			const columnResult = await columnService.createColumn(column);
-			await boardService.addColumnToBoard(columnResult.team, columnResult._id);
-			const team = await teamsService.getByQuery({ _id: room });
-			io.in(room).emit('board', team[0]);
-		} catch (error) {
-			console.error(error);
+	socket.on(
+		'addColumn',
+		async ({ room, columnName, git, gitProject, userId }) => {
+			try {
+				let gitColId;
+				if (git) {
+					let res = await gitService.createColumn(
+						gitProject,
+						{ name: columnName },
+						userId
+					);
+					gitColId = res.id;
+				}
+				let column = {
+					_id: mongoose.Types.ObjectId(),
+					team: room,
+					name: columnName,
+					...(git && { githubId: gitColId }),
+					...(git && { githubProject: gitProject }),
+					cards: [],
+				};
+				const columnResult = await columnService.createColumn(column);
+				await boardService.addColumnToBoard(
+					columnResult.team,
+					columnResult._id
+				);
+				const team = await teamsService.getByQuery({ _id: room });
+				io.in(room).emit('board', team[0]);
+			} catch (error) {
+				console.error(error);
+			}
 		}
-	});
+	);
 
-	socket.on('addCard', async ({ room, columnId }) => {
-		try {
-			console.log('room:', room);
-			console.log('column:', columnId);
-			let card = {
-				_id: mongoose.Types.ObjectId(),
-				team: room,
-				name: 'New card',
-			};
-			const cardResult = await cardService.createCard(card);
-			await columnService.addCardToColumn(columnId, cardResult._id);
-			const team = await teamsService.getByQuery({ _id: room });
-			io.in(room).emit('board', team[0]);
-		} catch (error) {
-			console.error(error);
+	socket.on(
+		'addCard',
+		async ({ room, columnId, githubColumnId, git, userId, gitProject }) => {
+			try {
+				console.log(git, userId, githubColumnId);
+				let gitCardId;
+				if (git) {
+					let res = await gitService.createCard(
+						githubColumnId,
+						{ note: 'New Card' },
+						userId
+					);
+					gitCardId = res.id;
+				}
+				let card = {
+					_id: mongoose.Types.ObjectId(),
+					team: room,
+					name: 'New card',
+					...(git && { githubId: gitCardId }),
+					...(git && { githubProject: gitProject }),
+				};
+				const cardResult = await cardService.createCard(card);
+				await columnService.addCardToColumn(columnId, cardResult._id);
+				const team = await teamsService.getByQuery({ _id: room });
+				io.in(room).emit('board', team[0]);
+			} catch (error) {
+				console.error(error);
+			}
 		}
-	});
+	);
 
-	socket.on('changeCardName', async ({ room, cardId, name, columnId }) => {
-		try {
-			console.log(room);
-			await cardService.updateCard(cardId, { name: name });
-			let newCard = await cardService.getByQuery({ _id: cardId });
-			newCard = JSON.stringify(newCard[0]);
-			newCard = JSON.parse(newCard);
-			socket.to(room).emit('cardUpdated', { ...newCard, columnId: columnId });
-		} catch (error) {
-			console.error(error);
+	socket.on(
+		'changeCardName',
+		async ({ room, cardId, name, columnId, git, githubId, userId }) => {
+			try {
+				console.log(git, githubId);
+				if (git) await gitService.updateCard(githubId, { note: name }, userId);
+				await cardService.updateCard(cardId, { name: name });
+				let newCard = await cardService.getByQuery({ _id: cardId });
+				newCard = JSON.stringify(newCard[0]);
+				newCard = JSON.parse(newCard);
+				socket.to(room).emit('cardUpdated', { ...newCard, columnId: columnId });
+			} catch (error) {
+				console.error(error);
+			}
 		}
-	});
+	);
 
-	socket.on('changeColumnName', async ({ room, columnId, name }) => {
-		try {
-			console.log(room);
-			await columnService.updateColumn(columnId, { name: name });
-			const newColumn = await columnService.getByQuery({ _id: columnId });
-			socket.to(room).emit('columnUpdated', newColumn[0]);
-		} catch (error) {
-			console.error(error);
+	socket.on(
+		'changeColumnName',
+		async ({ room, columnId, name, git, githubId, userId }) => {
+			try {
+				console.log(git, githubId, userId);
+				if (git)
+					await gitService.updateColumn(githubId, { name: name }, userId);
+				await columnService.updateColumn(columnId, { name: name });
+				const newColumn = await columnService.getByQuery({ _id: columnId });
+				socket.to(room).emit('columnUpdated', newColumn[0]);
+			} catch (error) {
+				console.error(error);
+			}
 		}
-	});
+	);
 
 	socket.on(
 		'changeCardIndex',
-		async ({ room, cardId, columnId, oldIndex, newIndex }) => {
+		async ({
+			room,
+			cardId,
+			columnId,
+			oldIndex,
+			newIndex,
+			position,
+			githubId,
+			git,
+			userId,
+		}) => {
 			try {
+				console.log({ position, githubId });
+				if (git)
+					await gitService.moveCard(githubId, { position: position }, userId);
 				await columnService.updateCardIndex(cardId, columnId, newIndex);
 				socket
 					.to(room)
@@ -167,8 +220,27 @@ io.on('connection', (socket) => {
 
 	socket.on(
 		'transferCard',
-		async ({ room, cardId, columnId, prevColId, oldIndex, newIndex }) => {
+		async ({
+			room,
+			cardId,
+			columnId,
+			prevColId,
+			oldIndex,
+			newIndex,
+			githubColumn,
+			githubId,
+			position,
+			git,
+			userId,
+		}) => {
 			try {
+				console.log({ position, githubId, githubColumn });
+				if (git)
+					await gitService.moveCard(
+						githubId,
+						{ position: position, column_id: parseInt(githubColumn) },
+						userId
+					);
 				await columnService.updateCardColumn(
 					cardId,
 					columnId,

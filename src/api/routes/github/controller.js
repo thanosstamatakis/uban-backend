@@ -12,6 +12,10 @@ const config = require('~root/src/config');
 // Services
 const userService = require('~services/user');
 const authService = require('~services/authentication');
+const teamService = require('~services/team');
+const boardService = require('~services/board');
+const columnService = require('~services/column');
+const cardService = require('~services/card');
 
 /**
  * Controller function that implements a github login/register
@@ -95,7 +99,17 @@ module.exports.githubStrategy = async (req, res, next) => {
 
 module.exports.get_user_projects = async (req, res, next) => {
 	try {
+		const token = req.headers.authorization.split(' ')[1];
+		const decoded = await authService.decode(token);
+		console.log(decoded);
+		let results = [];
+
+		let userData = await userService.getById(decoded._id);
+
 		// Get all the github repos that the user owns
+		axios.defaults.headers.common[
+			'Authorization'
+		] = `token ${userData.githubAccessToken}`;
 		axios.defaults.headers.common[
 			'Accept'
 		] = `application/vnd.github.inertia-preview+json`;
@@ -110,7 +124,7 @@ module.exports.get_user_projects = async (req, res, next) => {
 					repoDescription: repo.description,
 				};
 			});
-		console.log(githubRepos);
+		// console.log(githubRepos);
 
 		// https://api.github.com/repos/thanosstamatakis/uban-backend/projects
 
@@ -120,12 +134,95 @@ module.exports.get_user_projects = async (req, res, next) => {
 				`https://api.github.com/repos/${repo.repoOwner}/${repo.repoName}/projects`
 			);
 			if (project.data.length) {
-				projects.push(project.data);
+				// projects.push({
+				// 	id: project.data[0].id,
+				// 	name: project.data[0].name,
+				// 	description: project.data[0].body,
+				// 	columnsUrl: project.data[0].columns_url,
+				// });
+
+				let team = {
+					_id: mongoose.Types.ObjectId(),
+					name: project.data[0].name,
+					githubId: project.data[0].id,
+					description: project.data[0].body,
+					members: [userData._id],
+				};
+
+				let columns;
+				let cards = [];
+				columns = await axios.get(project.data[0].columns_url);
+				columns = columns.data;
+				// console.log('Columns:', columns);
+
+				for (const [i, column] of columns.entries()) {
+					columns[i]['cards'] = [];
+					let individualCards = await axios.get(column.cards_url);
+					individualCards = individualCards.data.map((card) => {
+						delete card.creator;
+						const cardId = mongoose.Types.ObjectId();
+						columns[i]['cards'] = [...columns[i]['cards'], cardId];
+						return {
+							_id: cardId,
+							team: team._id,
+							githubId: card.id,
+							githubProject: team.githubId,
+							githubColumn: column.id,
+							name: card.note ? card.note : '',
+						};
+					});
+					cards.push(...individualCards);
+				}
+
+				columns = columns.map((column) => {
+					return {
+						_id: mongoose.Types.ObjectId(),
+						team: team._id,
+						name: column.name,
+						githubId: column.id,
+						githubProject: team.githubId,
+						cards: column.cards,
+					};
+				});
+
+				const board = {
+					_id: mongoose.Types.ObjectId(),
+					name: project.data[0].name,
+					githubId: project.data[0].id,
+					team: team._id,
+					columns: columns.map((column) => column._id),
+				};
+
+				team = { ...team, board: board._id };
+
+				console.log('Team:', team);
+				console.log('Boards:', board);
+				console.log('Columns:', columns);
+				console.log('Cards:', cards);
+				await teamService.createPreConfiguredTeam(team);
+				await boardService.createPreConfiguredBoard(board);
+				for (const column of columns) {
+					await columnService.createColumn(column);
+				}
+				for (const card of cards) {
+					await cardService.createCard(card);
+				}
+				results.push({ team, board, columns, cards });
 			}
 		}
 
-		console.log(projects);
-		return res.status(200).json({ userData, token });
+		// for (const [index, project] of projects.entries()) {
+		// 	const columns = await axios.get(project.columnsUrl);
+		// 	projects[index]['columns'] = columns.data.map((column) => {
+		// 		return {
+		// 			id: column.id,
+		// 			name: column.name,
+		// 			cardsUrl: column.cards_url,
+		// 		};
+		// 	});
+		// }
+
+		return res.status(200).json(results);
 	} catch (error) {
 		next(error);
 	}
