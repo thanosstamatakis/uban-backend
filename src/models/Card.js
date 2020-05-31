@@ -8,7 +8,10 @@ const cardSchema = mongoose.Schema({
 		ref: 'Team',
 		required: true,
 	},
-	name: { type: String, required: true },
+	githubId: { type: String, required: false },
+	githubProject: { type: String, required: false },
+	githubColumn: { type: String, required: false },
+	name: { type: String, default: '' },
 });
 
 module.exports = mongoose.model('Card', cardSchema);

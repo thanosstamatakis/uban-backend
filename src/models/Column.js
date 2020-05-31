@@ -10,6 +10,8 @@ const columnSchema = mongoose.Schema({
 		required: true,
 	},
 	name: { type: String, required: true },
+	githubId: { type: String, required: false },
+	githubProject: { type: String, required: false },
 	cards: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
