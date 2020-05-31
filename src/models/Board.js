@@ -10,6 +10,7 @@ const boardSchema = mongoose.Schema({
 		required: true,
 	},
 	name: { type: String, required: true },
+	githubId: { type: String, required: false },
 	columns: [
 		{
 			type: mongoose.Schema.Types.ObjectId,

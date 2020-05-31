@@ -13,6 +13,7 @@ const teamSchema = mongoose.Schema({
 			required: true,
 		},
 	],
+	githubId: { type: String, required: false },
 	board: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Board',
