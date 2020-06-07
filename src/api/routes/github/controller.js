@@ -38,7 +38,6 @@ module.exports.githubStrategy = async (req, res, next) => {
 		);
 
 		const accessToken = response.data.access_token;
-		console.log(accessToken);
 
 		// Get the users data
 		axios.defaults.headers.common['Authorization'] = `token ${accessToken}`;
@@ -101,7 +100,6 @@ module.exports.get_user_projects = async (req, res, next) => {
 	try {
 		const token = req.headers.authorization.split(' ')[1];
 		const decoded = await authService.decode(token);
-		console.log(decoded);
 		let results = [];
 
 		let userData = await userService.getById(decoded._id);
@@ -124,9 +122,6 @@ module.exports.get_user_projects = async (req, res, next) => {
 					repoDescription: repo.description,
 				};
 			});
-		// console.log(githubRepos);
-
-		// https://api.github.com/repos/thanosstamatakis/uban-backend/projects
 
 		let projects = [];
 		for (const repo of githubRepos) {
@@ -134,13 +129,6 @@ module.exports.get_user_projects = async (req, res, next) => {
 				`https://api.github.com/repos/${repo.repoOwner}/${repo.repoName}/projects`
 			);
 			if (project.data.length) {
-				// projects.push({
-				// 	id: project.data[0].id,
-				// 	name: project.data[0].name,
-				// 	description: project.data[0].body,
-				// 	columnsUrl: project.data[0].columns_url,
-				// });
-
 				let team = {
 					_id: mongoose.Types.ObjectId(),
 					name: project.data[0].name,
@@ -153,7 +141,6 @@ module.exports.get_user_projects = async (req, res, next) => {
 				let cards = [];
 				columns = await axios.get(project.data[0].columns_url);
 				columns = columns.data;
-				// console.log('Columns:', columns);
 
 				for (const [i, column] of columns.entries()) {
 					columns[i]['cards'] = [];
@@ -195,10 +182,6 @@ module.exports.get_user_projects = async (req, res, next) => {
 
 				team = { ...team, board: board._id };
 
-				console.log('Team:', team);
-				console.log('Boards:', board);
-				console.log('Columns:', columns);
-				console.log('Cards:', cards);
 				await teamService.createPreConfiguredTeam(team);
 				await boardService.createPreConfiguredBoard(board);
 				for (const column of columns) {

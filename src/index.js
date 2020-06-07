@@ -72,7 +72,7 @@ const messageService = require('~services/message');
 // Sockets
 // io.on('connection', socketHandler.onConnection);
 io.on('connection', (socket) => {
-	console.info(`Client connected [id=${socket.id}]`);
+	// console.info(`Client connected [id=${socket.id}]`);
 	let sequenceNumberByClient = new Map();
 	// socket.id.emit('message', 'Hey dude');
 	// initialize this client's sequence number
@@ -131,7 +131,6 @@ io.on('connection', (socket) => {
 		'addCard',
 		async ({ room, columnId, githubColumnId, git, userId, gitProject }) => {
 			try {
-				console.log(git, userId, githubColumnId);
 				let gitCardId;
 				if (git) {
 					let res = await gitService.createCard(
@@ -162,7 +161,6 @@ io.on('connection', (socket) => {
 		'changeCardName',
 		async ({ room, cardId, name, columnId, git, githubId, userId }) => {
 			try {
-				console.log(git, githubId);
 				if (git) await gitService.updateCard(githubId, { note: name }, userId);
 				await cardService.updateCard(cardId, { name: name });
 				let newCard = await cardService.getByQuery({ _id: cardId });
@@ -179,7 +177,6 @@ io.on('connection', (socket) => {
 		'changeColumnName',
 		async ({ room, columnId, name, git, githubId, userId }) => {
 			try {
-				console.log(git, githubId, userId);
 				if (git)
 					await gitService.updateColumn(githubId, { name: name }, userId);
 				await columnService.updateColumn(columnId, { name: name });
@@ -205,7 +202,6 @@ io.on('connection', (socket) => {
 			userId,
 		}) => {
 			try {
-				console.log({ position, githubId });
 				if (git)
 					await gitService.moveCard(githubId, { position: position }, userId);
 				await columnService.updateCardIndex(cardId, columnId, newIndex);
@@ -234,7 +230,6 @@ io.on('connection', (socket) => {
 			userId,
 		}) => {
 			try {
-				console.log({ position, githubId, githubColumn });
 				if (git)
 					await gitService.moveCard(
 						githubId,
@@ -268,10 +263,21 @@ io.on('connection', (socket) => {
 				sender: sender,
 				body: body,
 				seenBy: [sender],
+				profilePicture: '',
 			};
 			const savedMessage = await messageService.createMessage(message);
-			console.log('New message', savedMessage);
+			savedMessage.sender = user[0];
 			io.in(room).emit('message', savedMessage);
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
+	socket.on('updateMessageViews', async ({ room, userId, messages }) => {
+		try {
+			const res = await messageService.updateReadMessages(userId, messages);
+			const chatmessages = await messageService.getByQuery({ team: room });
+			socket.emit('messages', chatmessages);
 		} catch (error) {
 			console.error(error);
 		}

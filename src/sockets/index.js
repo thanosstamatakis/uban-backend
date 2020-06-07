@@ -10,7 +10,7 @@ const columnService = require('~services/column');
  */
 
 module.exports.onConnection = (socket) => {
-	console.info(`Client connected [id=${socket.id}]`);
+	// console.info(`Client connected [id=${socket.id}]`);
 	let sequenceNumberByClient = new Map();
 	// socket.id.emit('message', 'Hey dude');
 	// initialize this client's sequence number
@@ -18,7 +18,7 @@ module.exports.onConnection = (socket) => {
 	// when socket disconnects, remove it from the list:
 	socket.on('disconnect', () => {
 		sequenceNumberByClient.delete(socket);
-		console.info(`Client gone [id=${socket.id}]`);
+		// console.info(`Client gone [id=${socket.id}]`);
 	});
 
 	socket.on('join', async ({ room }) => {
@@ -32,9 +32,6 @@ module.exports.onConnection = (socket) => {
 
 	socket.on('addColumn', async ({ room, columnName }) => {
 		try {
-			// console.log(room, columnName);
-			// const smth = await boardService.getByQuery({});
-			// console.log(smth);
 			let column = {
 				_id: mongoose.Types.ObjectId(),
 				team: room,
@@ -44,7 +41,6 @@ module.exports.onConnection = (socket) => {
 			const columnResult = await columnService.createColumn(column);
 			await boardService.addColumnToBoard(columnResult.team, columnResult._id);
 			const team = await teamsService.getByQuery({ _id: room });
-			console.log(team);
 			socket.to(room).emit('board', team[0]);
 		} catch (error) {
 			console.error(error);
@@ -52,7 +48,6 @@ module.exports.onConnection = (socket) => {
 	});
 
 	socket.on('message', ({ room, message }) => {
-		console.log(room, message);
 		socket.to(room).emit('message', message);
 	});
 };
