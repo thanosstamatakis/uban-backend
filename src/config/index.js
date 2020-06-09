@@ -17,7 +17,7 @@ class Configuration {
 			this.frontendIp = process.env.FE_IP;
 			this.frontendPort = Number(process.env.FE_PT);
 			this.backendIp = process.env.BE_IP;
-			this.backendPort = Number(process.env.BE_PT);
+			this.backendPort = process.env.PORT || 5000;
 			this.databaseIp = process.env.DB_IP;
 			this.databasePort = Number(process.env.DB_PT);
 			this.databaseName = process.env.DB_NM;
