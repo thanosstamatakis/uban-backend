@@ -4,10 +4,11 @@
 	"description": "",
 	"main": "src/index.js",
 	"scripts": {
-		"start": "npm run postinstall & NODE_ENV=production node .",
+		"start": "NODE_ENV=production node .",
 		"dev": "nodemon .",
 		"dev-yaml": "nodemon .",
 		"delete": "rm -rf node_modules",
+		"preinstall": "command -v link-module-alias && link-module-alias clean || true",
 		"postinstall": "link-module-alias"
 	},
 	"repository": {
