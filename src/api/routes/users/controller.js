@@ -6,17 +6,17 @@
 const mongoose = require('mongoose');
 
 // Libs authored by team
-const config = require('~root/src/config');
+const config = require('../../../config');
 
 // Services
-const userService = require('~services/user');
-const passwordService = require('~services/password');
-const authService = require('~services/authentication');
-const emailService = require('~services/email');
+const userService = require('../../services/user');
+const passwordService = require('../../services/password');
+const authService = require('../../services/authentication');
+const emailService = require('../../services/email');
 
 // Constants
-const emailConstants = require('~constants/email');
-const userMessages = require('~constants/messages').error.user;
+const emailConstants = require('../../../constants/email');
+const userMessages = require('../../../constants/messages').error.user;
 
 /**
  * Controller function that returns all the user entities

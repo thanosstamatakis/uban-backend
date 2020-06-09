@@ -2,8 +2,8 @@
  * Authentication services
  */
 const jwt = require('jsonwebtoken');
-const config = require('~root/src/config');
-const authMessages = require('~constants/messages').error.auth;
+const config = require('../../../config');
+const authMessages = require('../../../constants/messages').error.auth;
 
 /**
  * Create a jsonwebtoken from email and id

@@ -1,4 +1,4 @@
-const Message = require('~models/Message');
+const Message = require('../../../models/Message');
 
 const getByQuery = async (query) => {
 	const result = await Message.find(query).populate('sender').exec();

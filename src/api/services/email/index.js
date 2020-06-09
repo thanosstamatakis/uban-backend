@@ -3,8 +3,8 @@ const handlebars = require('handlebars');
 const fs = require('fs-extra');
 const path = require('path');
 
-const config = require('~root/src/config');
-const emailConstants = require('~constants/email');
+const config = require('../../../config');
+const emailConstants = require('../../../constants/email');
 
 const transporter = nodemailer.createTransport({
 	service: config.emailService,
@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-const sendEmail = mailOptions => {
+const sendEmail = (mailOptions) => {
 	return new Promise((resolve, reject) => {
 		transporter.sendMail(mailOptions, (err, info) => {
 			if (err) {

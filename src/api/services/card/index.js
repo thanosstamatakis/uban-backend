@@ -1,4 +1,4 @@
-const Card = require('~models/Card');
+const Card = require('../../../models/Card');
 
 const getByQuery = async (query) => {
 	const result = await Card.find(query)

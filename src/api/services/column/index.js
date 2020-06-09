@@ -5,11 +5,11 @@ const mongoose = require('mongoose');
 /**
  Authored by team
  **/
-const cardService = require('~services/card');
+const cardService = require('../card');
 /**
  Database Models
  **/
-const Column = require('~models/Column');
+const Column = require('../../../models/Column');
 
 const getByQuery = async (query) => {
 	const result = await Column.find(query)

@@ -5,11 +5,11 @@ const mongoose = require('mongoose');
 /**
 	Authored by team
 **/
-const boardService = require('~services/board');
+const boardService = require('../board');
 /**
 	Database Models
 **/
-const Team = require('~models/Team');
+const Team = require('../../../models/Team');
 
 const getByQuery = async (query) => {
 	const result = await Team.find(query)

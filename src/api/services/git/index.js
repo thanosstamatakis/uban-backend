@@ -1,5 +1,5 @@
 const axios = require('axios');
-const userService = require('~services/user');
+const userService = require('../user');
 
 const updateCard = async (id, updateOpts, userId) => {
 	try {

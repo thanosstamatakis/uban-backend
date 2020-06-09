@@ -1,4 +1,4 @@
-const config = require('~root/src/config');
+const config = require('../config');
 const path = require('path');
 
 module.exports.from = 'uBan';
@@ -8,7 +8,7 @@ module.exports.verificationEmail = {
 	getTemplatePath: () => {
 		return path.join(config.templateFolder, 'emailVerification.handlebars');
 	},
-	getUrl: token => {
+	getUrl: (token) => {
 		const frontendUrl = config.getFrontendUrl();
 		return `${frontendUrl}/verification/${token}`;
 	},
@@ -19,7 +19,7 @@ module.exports.resetPassword = {
 	getTemplatePath: () => {
 		return path.join(config.templateFolder, 'passwordRecovery.handlebars');
 	},
-	getUrl: token => {
+	getUrl: (token) => {
 		const frontendUrl = config.getFrontendUrl();
 		return `${frontendUrl}/recovery/${token}`;
 	},

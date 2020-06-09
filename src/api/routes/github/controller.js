@@ -7,15 +7,15 @@ const mongoose = require('mongoose');
 const request = require('superagent');
 let axios = require('axios');
 // Libs authored by team
-const config = require('~root/src/config');
+const config = require('../../../config');
 
 // Services
-const userService = require('~services/user');
-const authService = require('~services/authentication');
-const teamService = require('~services/team');
-const boardService = require('~services/board');
-const columnService = require('~services/column');
-const cardService = require('~services/card');
+const userService = require('../../services/user');
+const authService = require('../../services/authentication');
+const teamService = require('../../services/team');
+const boardService = require('../../services/board');
+const columnService = require('../../services/column');
+const cardService = require('../../services/card');
 
 /**
  * Controller function that implements a github login/register

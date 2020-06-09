@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Board = require('~models/Board');
+const Board = require('./Board');
 
 // Create the team model for mongoose
 const teamSchema = mongoose.Schema({

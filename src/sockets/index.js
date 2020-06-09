@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-const teamsService = require('~services/team');
-const authService = require('~services/authentication');
-const boardService = require('~services/board');
-const columnService = require('~services/column');
+const teamsService = require('../api/services/team');
+const authService = require('../api/services/authentication');
+const boardService = require('../api/services/board');
+const columnService = require('../api/services/column');
 
 /**
  * Main sockets index.

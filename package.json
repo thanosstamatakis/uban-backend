@@ -7,9 +7,7 @@
 		"start": "NODE_ENV=production node .",
 		"dev": "nodemon .",
 		"dev-yaml": "nodemon .",
-		"delete": "rm -rf node_modules",
-		"preinstall": "command -v link-module-alias && link-module-alias clean || true",
-		"postinstall": "link-module-alias"
+		"delete": "rm -rf node_modules"
 	},
 	"repository": {
 		"type": "git",
@@ -56,17 +54,6 @@
 	},
 	"devDependencies": {
 		"jest": "^24.8.0",
-		"link-module-alias": "^1.2.0",
 		"nodemon": "^1.19.1"
-	},
-	"_moduleAliases": {
-		"~root": ".",
-		"~htmlTemplates": "src/templates",
-		"~routes": "src/api/routes",
-		"~middleware": "src/api/middleware",
-		"~models": "src/models",
-		"~services": "src/api/services",
-		"~constants": "src/constants",
-		"~sockets": "src/sockets"
 	}
 }

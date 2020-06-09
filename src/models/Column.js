@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Card = require('~models/Card');
+const Card = require('./Card');
 
 // Create the user model for mongoose
 const columnSchema = mongoose.Schema({

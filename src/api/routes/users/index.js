@@ -2,8 +2,8 @@ const multer = require('multer');
 
 const router = require('express').Router();
 const controller = require('./controller');
-const checkAuth = require('~middleware/check-auth');
-const config = require('~root/src/config');
+const checkAuth = require('../../middleware/check-auth');
+const config = require('../../../config');
 
 // Set the location and name settings for files uploaded
 const storage = multer.diskStorage({

@@ -6,12 +6,12 @@
 const mongoose = require('mongoose');
 
 // Libs authored by team
-const config = require('~root/src/config');
+const config = require('../../../config');
 
 // Services
-const teamService = require('~services/team');
-const messageService = require('~services/message');
-const authService = require('~services/authentication');
+const teamService = require('../../services/team');
+const messageService = require('../../services/message');
+const authService = require('../../services/authentication');
 
 /**
  * Controller function that returns all the unread message entities

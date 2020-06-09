@@ -11,14 +11,14 @@ const swaggerUi = require('swagger-ui-express');
 
 // Project files.
 const config = require('./config');
-const logMessages = require('~constants/messages').log;
+const logMessages = require('./constants/messages').log;
 const ApiRouter = require('./api');
 
 const logger = config.getLogger('/api/v1');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, { pingInterval: 10000 });
-const socketHandler = require('~sockets/');
+const socketHandler = require('./sockets');
 const swaggerDocument = yaml.load('./src/swagger.yaml');
 
 // Connect to database
@@ -61,14 +61,14 @@ app.use((error, req, res, next) => {
 const port = config.backendPort;
 server.listen(port, () => logger.info(logMessages.getStartupLog(port)));
 
-const teamsService = require('~services/team');
-const authService = require('~services/authentication');
-const userService = require('~services/user');
-const boardService = require('~services/board');
-const columnService = require('~services/column');
-const cardService = require('~services/card');
-const gitService = require('~services/git');
-const messageService = require('~services/message');
+const teamsService = require('./api/services/team');
+const authService = require('./api/services/authentication');
+const userService = require('./api/services/user');
+const boardService = require('./api/services/board');
+const columnService = require('./api/services/column');
+const cardService = require('./api/services/card');
+const gitService = require('./api/services/git');
+const messageService = require('./api/services/message');
 // Sockets
 // io.on('connection', socketHandler.onConnection);
 io.on('connection', (socket) => {

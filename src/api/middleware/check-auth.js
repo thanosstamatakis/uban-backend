@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const config = require('~root/src/config');
+const config = require('../../config');
 const logger = config.getLogger('middleware');
 /**
  * Middleware that validates a json web token stored as a cookie

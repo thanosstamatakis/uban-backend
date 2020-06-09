@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const controller = require('./controller');
-const checkAuth = require('~middleware/check-auth');
+const checkAuth = require('../../middleware/check-auth');
 
 router.get('/auth', controller.githubStrategy);
 
