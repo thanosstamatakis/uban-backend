@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "src/index.js",
 	"scripts": {
-		"start": "NODE_ENV=development node .",
+		"start": "NODE_ENV=production FE_IP=https://uban.netlify.app BE_IP=https://uban.azurewebsites.net BE_PT=443 FE_PT=443 DB_PT=27017 DB_NM=uban DB_IP=83.212.99.92 DB_UNM=uadmin DB_UPS=uadmin JWT=yM4wflDSK4cXKve-akilXvjx JWT_SESS=1d GOOGLE_API=647941072276-d6m34gl68i8ape6e4u86equevd1h5foc.apps.googleusercontent.com GITHUB_API=8b46926d19faa67ad555 GITHUB_API_SECRET=43cd549385613d669b60c681fc4095b4c253f489 node .",
 		"dev": "nodemon .",
 		"dev-yaml": "nodemon .",
 		"delete": "rm -rf node_modules",
